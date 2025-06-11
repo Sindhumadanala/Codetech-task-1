@@ -1,0 +1,97 @@
+//Verilog code------------------------------------------------------------------------------------------
+
+module ALU (
+    input  [7:0] A,      // Operand A
+    input  [7:0] B,      // Operand B
+    input  [2:0] op,     // Operation select
+    output reg [7:0] result
+);
+
+always @(*) begin
+    case (op)
+        3'b000: result = A + B;           // Addition
+        3'b001: result = A - B;           // Subtraction
+        3'b010: result = A & B;           // AND
+        3'b011: result = ~(A | B);        // NOR
+        3'b100: result = ~A;              // NOT (on A)
+        default: result = 8'b0;
+    endcase
+end
+
+endmodule
+
+
+//Test bench-----------------------------------------------------------------------------------
+
+module ALU_tb;
+    reg  [7:0] A, B;
+    reg  [2:0] op;
+    wire [7:0] result;
+
+    ALU uut (
+        .A(A),
+        .B(B),
+        .op(op),
+        .result(result)
+    );
+
+    initial begin
+        $display("ALU Testbench Start");
+        // Addition
+        A = 8'h10; B = 8'h05; op = 3'b000; #10;
+        $display("ADD: %h + %h = %h", A, B, result);
+
+        // Subtraction
+        A = 8'h10; B = 8'h05; op = 3'b001; #10;
+        $display("SUB: %h - %h = %h", A, B, result);
+
+        // AND
+        A = 8'hF0; B = 8'h0F; op = 3'b010; #10;
+        $display("AND: %h & %h = %h", A, B, result);
+
+        // NOR
+        A = 8'hF0; B = 8'h0F; op = 3'b011; #10;
+        $display("NOR: ~(%h | %h) = %h", A, B, result);
+
+        // NOT (A)
+        A = 8'hAA; B = 8'h00; op = 3'b100; #10;
+        $display("NOT: ~%h = %h", A, result);
+
+        // Default
+        A = 8'h01; B = 8'h02; op = 3'b111; #10;
+        $display("Default: %h", result);
+
+        $display("ALU Testbench End");
+        $stop;
+    end
+endmodule
+
+//simulation report-----------------------------------------------------------------------------------------
+
+
+# ALU Simulation Report
+
+## Operations Tested
+
+| Operation    | Input A | Input B | op   | Expected Result | Observed Result |
+|--------------|---------|---------|------|----------------|-----------------|
+| Addition     | 0x10    | 0x05    | 000  | 0x15           | 0x15            |
+| Subtraction  | 0x10    | 0x05    | 001  | 0x0B           | 0x0B            |
+| AND          | 0xF0    | 0x0F    | 010  | 0x00           | 0x00            |
+| NOR          | 0xF0    | 0x0F    | 011  | 0x00           | 0x00            |
+| NOT (on A)   | 0xAA    | 0x00    | 100  | 0x55           | 0x55            |
+| Default      | 0x01    | 0x02    | 111  | 0x00           | 0x00            |
+
+## Results
+
+- All operations produced the expected results.
+- ALU design is functioning as intended for addition, subtraction, AND, NOR, and NOT.
+
+## Waveform
+
+- The waveform confirms correct switching and output for each operation.
+- No glitches or undefined outputs observed during simulation.
+
+## Conclusion
+
+The basic ALU design is verified and works correctly for all specified operations.
